@@ -8,11 +8,11 @@ Note: These scripts use environmental variables which only apply to a single ter
 within the same terminal.
 
 ################################################################
-# Customize the install scripts with your license and AWS region
+# Pre-Steps: Customize the install scripts with your license and AWS region
 ################################################################
 
 
-1) Edit the install_consul_server.sh, install_consul_client1.sh, install_consul_client2.sh files:
+0) Edit the install_consul_server.sh, install_consul_client1.sh, install_consul_client2.sh files:
 
    a) Your Enterprice Consul license.  
    
