@@ -1,6 +1,7 @@
 Pre-reqs:
 - Helm installed (Download: https://github.com/helm/helm/releases).
 - Consul Enteprise license: Add license to the install_consul_server.sh script.
+  You can request a 30 day trial license here: https://www.hashicorp.com/products/consul/trial 
 - 3 EKS Clusters are available. A terraform script is available for you to deploy 3 EKS clusters to your desired AWS regions.
 - You are logged onto your AWS acccount
 
