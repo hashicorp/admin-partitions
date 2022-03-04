@@ -16,14 +16,15 @@ within the same terminal.
 0) Edit the install_consul_server.sh, install_consul_client1.sh, install_consul_client2.sh files:
 
    a) Your Enterprice Consul license.  
-   
+``` 
       export CONSUL_LICENSE=<ADD_YOUR_LICENSE_HERE>
+```
       #You can request a 30 day trial license here: https://www.hashicorp.com/products/consul/trial
 
    b) Your desired AWS region. Example: 
-
+```
       export AWSREGION= eu-north-1
-
+```
 
 
 
@@ -34,17 +35,17 @@ within the same terminal.
 
 
 1) Run install_consul_server.sh to deploy Consul Server:
-
+```
   source install_consul_server.sh
+```
+  Note: We're executing the install script using the ```source``` command in order to preserve the environmental variables.
 
-  Note: We're executing the install script using the "source" command in order to preserve the environmental variables.
-
-2) Get External-IP (or DNS name) of the Consul server's "consul-consul-partition-service" 
-  
+2) Get External-IP (or DNS name) of the Consul server's ```consul-consul-partition-service``` 
+```  
   kubectl get services consul-consul-partition-service --context $EKS_CLUSTER_SERVER_CTX
   NAME                                 TYPE           CLUSTER-IP       EXTERNAL-IP                                                                                                                                            
   consul-consul-partition-service      LoadBalancer   172.20.138.45    a45c0d48015ed418fbebb1154604f20c-163347652.eu-north-1.elb.amazonaws.com    
-  
+```  
   
   Note: On a notepad, copy/paste your output for the External-IP of the "consul-consul-partition-service". We will use in the next couple of steps.
 
@@ -55,20 +56,20 @@ within the same terminal.
 
   
 3) Get DNS name of EKS API Server of Client 1. Copy/paste the output onto a notepad. We will use this to get the next step.
-   
+```   
    kubectl config view -o jsonpath="{.clusters[?(@.name=='$EKS_CLUSTER_CLIENT1_CTX')].cluster.server}" | sed 's/https:\/\///'
-
+```
 4) Edit helm-client-team1.yaml file:
   
-   a) Edit both the "hosts" and "join" fields to reflect the External-IP (or DNS name) of the consul-consul-partition-service on the Server EKS cluster. 
+   a) Edit both the ```hosts``` and ```join``` fields to reflect the External-IP (or DNS name) of the consul-consul-partition-service on the Server EKS cluster. 
       You should have noted the External-IP was mentioned in the previous STEP 2.
       
-   b) Edit the "k8sAuthMethodHost" field to reflect the EKS API server's IP/DNS name of the Client 1 EKS Cluster. 
+   b) Edit the ```k8sAuthMethodHost``` field to reflect the EKS API server's IP/DNS name of the Client 1 EKS Cluster. 
       You retreived the EKS API server DNS name from STEP 3. 
       
   
   Example inputs for the helm-client-team1.yaml file:
-  
+ ``` 
   externalServers:
     enabled: true
     hosts: [ "a45c0d48015ed418fbebb1154604f20c-163347652.eu-north-1.elb.amazonaws.com" ]
@@ -79,12 +80,12 @@ within the same terminal.
     enabled: true
     exposeGossipPorts: true
     join: [ "a45c0d48015ed418fbebb1154604f20c-163347652.eu-north-1.elb.amazonaws.com" ]
-
+```
 
 5) Run install_consul_client1.sh script to deploy Consul Client 1:
-
+```
   source install_consul_client1.sh
-  
+```  
   
   
 
@@ -93,21 +94,21 @@ within the same terminal.
 #################
 
 6) Get DNS name of EKS API Server of Client 2. Make a note of the output. We will use this to get the next step.
-   
+```   
    kubectl config view -o jsonpath="{.clusters[?(@.name=='$EKS_CLUSTER_CLIENT2_CTX')].cluster.server}" | sed 's/https:\/\///'
-
+```
 7) Edit helm-client-team2.yaml file:
   
-   a) Edit both the "hosts" and "join" fields to reflect the External-IP (or DNS name) of the consul-consul-partition-service on the Server EKS cluster. 
+   a) Edit both the ```hosts``` and ```join``` fields to reflect the External-IP (or DNS name) of the consul-consul-partition-service on the Server EKS cluster. 
       You should have noted the External-IP was mentioned in the previous step 2.
       
-   b) Edit the "k8sAuthMethodHost" field to reflect the EKS API server's IP/DNS name of the Client 2 EKS Cluster. 
+   b) Edit the ```k8sAuthMethodHost``` field to reflect the EKS API server's IP/DNS name of the Client 2 EKS Cluster. 
       You retreived the EKS API server DNS name from step 6. 
       
       
   
   Example inputs for the helm-client-team1.yaml file:
-  
+ ``` 
   externalServers:
     enabled: true
     hosts: [ "a45c0d48015ed418fbebb1154604f20c-163347652.eu-north-1.elb.amazonaws.com" ]
@@ -118,12 +119,12 @@ within the same terminal.
     enabled: true
     exposeGossipPorts: true
     join: [ "a45c0d48015ed418fbebb1154604f20c-163347652.eu-north-1.elb.amazonaws.com" ]
-
+```
 
 8) Run install_consul_client2.sh to deploy Consul Client 2
-
+```
       source install_consul_client2.sh
-      
+```      
       Consul should now be install with two separate Kubernetes Clusters belonging to two separate Consul partitions (team1 and team2) 
       Teams/tenants can deploy their services in their respective K8s clusters and will be completely isolated from teams and services
       in other partitions.
@@ -136,15 +137,15 @@ within the same terminal.
 
 To view the Consul UI with a browser, use the EXTERNAL-IP of the consul ui service. 
 Note: TLS is enabled in this example, therefore use https:// with port 443.
-
+```
   kubectl get services consul-consul-ui --context $EKS_CLUSTER_SERVER_CTX
   NAME               TYPE           CLUSTER-IP       EXTERNAL-IP                                                                PORT(S)         
   consul-consul-ui   LoadBalancer   172.20.183.226   a4f396d083ebe43559e2e29582ea3b35-1404433695.eu-north-1.elb.amazonaws.com   443:32563/TCP  
-
+```
 For demo purposes, you can use the boostrap ACL token to log ontn UI. Token can be retrieve with:
-
+```
   kubectl get secrets/consul-consul-bootstrap-acl-token --template='{{.data.token | base64decode }}' --context $EKS_CLUSTER_SERVER_CTX
-
+```
 In the UI, notice you can toggle between partitions using the Admin Partition box in the upper left side.
 
 #################################
@@ -156,47 +157,47 @@ We will run through the steps manually so show you exactly how it works.
  
    
 1) Deploy frontend app.
-
+```
    kubectl apply -f apps/fakeapp/frontend.yaml --context $EKS_CLUSTER_CLIENT1_CTX 
-
+```
    You should notice the frontend service appear in the UI -> Services window from the team1 partition.
 
 2) Deploy backend app.
-
+```
    kubectl apply -f apps/fakeapp/backend.yaml --context $EKS_CLUSTER_CLIENT2_CTX
-   
+```   
    You should notice the backend service appear in the UI -> Services window from the team2 partition.
 
 3) Export services from partition "team2" to parition "team1".
- 
+``` 
    kubectl apply -f apps/fakeapp/export-back.yaml --context $EKS_CLUSTER_CLIENT2_CTX
-   
+```   
    
 4) (Optional) This step is only needed if you are connecting services in partitions that belong in different non-routable VPC/subnets. 
    If so, export services from partition "team1" to parition "team2".
-   
+```   
    kubectl apply -f apps/fakeapp/export-front.yaml --context $EKS_CLUSTER_CLIENT1_CTX   
-   
+```   
 
 
 5) (Optional) This step is only needed if you are connecting services in partitions that belong in different non-routable VPC/subnets.  
    If so, Deploy Proxy-default (or Service-default to specify granular service) to send frontend traffic to Mesh GW.
-
+```
    kubectl apply -f proxydefault.yaml --context $EKS_CLUSTER_CLIENT1_CTX   
-
+```
    If so, you will also need to do the following:   
     
       b) deploy mesh GW using helm charts for each K8s Consul client clusters. 
       c) Include Mesh GWs in exported-service config entries (Previous Step 3 + 4).
 
 6) View fakeapp service using EXTERNAL-IP:
-
+```
    kubectl get service frontend --context $EKS_CLUSTER_CLIENT1_CTX
-
+```
    Open browser and enter the EXTERNAL-IP address and append port 9090 and /ui path to the URL.
    Note: Note: AWS may take a few mins for the EXTERNAL-IP DNS name to resolve. Give it some time.
-   
+```   
    http://<EXTERNAL-IP>:9090/ui
-   
+```   
   You should see two boxes in grey color, depicting that there is connectivity. 
   If the boxes are in red, that means the frontend service is not able to reach the backend service.
