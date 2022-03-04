@@ -29,7 +29,7 @@ You can request a 30 day trial license here: https://www.hashicorp.com/products/
 
 # Instructions Steps:
 
-# CONSUL SERVER
+**CONSUL SERVER**
 
 
 
@@ -50,7 +50,7 @@ source install_consul_server.sh
   Note: On a notepad, copy/paste your output for the External-IP of the "consul-consul-partition-service". We will use in the next couple of steps.
 
 
-# CONSUL CLIENT 1
+**CONSUL CLIENT 1**
 
 
   
@@ -89,7 +89,7 @@ source install_consul_client1.sh
   
 
 
-# CONSUL CLIENT 2
+**CONSUL CLIENT 2**
 
 
 6) Get DNS name of EKS API Server of Client 2. Make a note of the output. We will use this to get the next step.
@@ -134,6 +134,7 @@ in other partitions.
 # VIEW UI
 
 
+
 To view the Consul UI with a browser, use the EXTERNAL-IP of the consul ui service. 
 Note: TLS is enabled in this example, therefore use https:// with port 443.
 ```
@@ -148,7 +149,9 @@ kubectl get secrets/consul-consul-bootstrap-acl-token --template='{{.data.token 
 In the UI, notice you can toggle between partitions using the Admin Partition box in the upper left side.
 
 
+
 # CROSS PARTITION COMMUNICATION
+
 
 
 This is an example showing a simple app that has a frontend service in the "team1" partition that connects to a backend service in  thw "team1" partition.
@@ -184,10 +187,11 @@ kubectl apply -f apps/fakeapp/export-front.yaml --context $EKS_CLUSTER_CLIENT1_C
 ```
 kubectl apply -f proxydefault.yaml --context $EKS_CLUSTER_CLIENT1_CTX   
 ```
-   If so, you will also need to do the following:   
-    
-      a) deploy mesh GW using helm charts for each K8s Consul client clusters. 
-      b) Include Mesh GWs in exported-service config entries (Previous Step 3 + 4).
+   You will also need to do the following:
+   
+- Deploy mesh GW using helm charts for each K8s Consul client clusters. 
+- Include Mesh GWs in exported-service config entries for both ```export-back.yaml``` and ```export-back.yaml``` files 
+- Reapply the export files from previous Step 3 + 4
 
 
 
