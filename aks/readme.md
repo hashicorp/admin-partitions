@@ -50,7 +50,7 @@ kubectl create secret generic license --from-literal=key=$CONSUL_LICENSE
 6) Deploy Consul server
 
 ```
-helm install consul hashicorp/consul -f helm-server.yaml --wait --debug
+helm install consul hashicorp/consul -f helm-server.yaml --version=0.43.0 --wait --debug
 ```
 
 When complete, example deplpoyment:
@@ -58,6 +58,7 @@ When complete, example deplpoyment:
 ```
 kubectl get pods --context $EKS_CLUSTER_SERVER_CTX
 NAME                                                 READY   STATUS    RESTARTS   AGE
+consul-consul-client-49m6n                           1/1     Running   0          99m
 consul-consul-client-7dwsh                           1/1     Running   0          99m
 consul-consul-connect-injector-74687f4679-8jbhm      1/1     Running   0          99m
 consul-consul-connect-injector-74687f4679-tlgdn      1/1     Running   0          99m
