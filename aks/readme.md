@@ -3,9 +3,9 @@
 
 # Pre-reqs
 
-1) Clone this repo: 
+1) Clone this repo and navigate to the ```admin-partitions/aks/``` directory.
 
-   git clone 
+   git clone https://github.com/hashicorp/admin-partitions.git
 
 2) Deploy 3 AKS clusters in your Azure envronments. Make sure when you create your AKS clusters that you are selecting the Azure CNI (instead of Kubenet)
     
@@ -21,7 +21,7 @@ export CONSUL_LICENSE=<ADD_YOUR_LICENSE_HERE>
 
 You can request a 30 day trial license here: https://www.hashicorp.com/products/consul/trial
 
-2) Set environmental variables for your server and client kubernetes contexts
+2) Set environmental variables for your 3 clusters:
 ```
 export EKS_CLUSTER_SERVER_CTX=<YOUR_K8s_CONTEXT__FOR_CONSUL_SERVER>
 export EKS_CLUSTER_CLIENT1_CTX=<YOUR_K8s_CONTEXT__FOR_CONSUL_CLIENT1>
