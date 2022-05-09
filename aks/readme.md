@@ -159,9 +159,9 @@ kubectl config use-context $EKS_CLUSTER_CLIENT1_CTX
 kubectl create secret generic license --from-literal=key=$CONSUL_LICENSE
 ```
 13) Deploy Consul
-
-helm install consul hashicorp/consul -f helm-client-team1.yaml --wait --debug
-
+```
+helm install consul hashicorp/consul -f helm-client-team1.yaml --version=0.43.0 --wait --debug
+```
 
 Example output of successful deployment:
 ```
