@@ -242,6 +242,15 @@ dns:
 EOF
 ```
 
+11) Copy tls cert/keys and partition acl tokens from Consul server cluster to the client cluster. This is needed if tls and acls are enabled.
+
+```
+kubectl get secret consul-consul-ca-cert --context $EKS_CLUSTER_SERVER_CTX -o yaml | kubectl apply --context $EKS_CLUSTER_CLIENT2_CTX -f -
+kubectl get secret consul-consul-ca-key --context $EKS_CLUSTER_SERVER_CTX -o yaml | kubectl apply --context $EKS_CLUSTER_CLIENT2_CTX -f -
+kubectl get secret consul-consul-partitions-acl-token --context $EKS_CLUSTER_SERVER_CTX -o json | kubectl apply --context $EKS_CLUSTER_CLIENT2_CTX -f -
+```
+
+
 11) Set Consul context to point to the K8s cluster for the Consul server.
 
 ```
