@@ -94,7 +94,7 @@ global:
   image: hashicorp/consul-enterprise:1.12.0-ent
   adminPartitions:
     enabled: true
-    name: "team1"
+    name: "team2"
 
   enterpriseLicense:
     secretName: license
