@@ -242,12 +242,21 @@ dns:
 EOF
 ```
 
+11) Set Consul context to point to the K8s cluster for the Consul server.
 
+```
+kubectl config use-context $EKS_CLUSTER_CLIENT2_CTX
+```
+
+12) Add Consul Ent license as a K8s secret
+```
+kubectl create secret generic license --from-literal=key=$CONSUL_LICENSE
+```
 
 16) Deploy Consul
-
-helm install consul hashicorp/consul -f helm-client-team2.yaml --wait --debug
-
+```
+helm install consul hashicorp/consul -f helm-client-team2.yaml --version=0.43.0 --wait --debug
+```
 
 Example output of successful deployment:
 ```
