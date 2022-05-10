@@ -25,7 +25,7 @@ You can request a 30 day trial license here: https://www.hashicorp.com/products/
 ```
 export EKS_CLUSTER_SERVER_CTX=<YOUR_K8s_CONTEXT__FOR_CONSUL_SERVER>
 export EKS_CLUSTER_CLIENT1_CTX=<YOUR_K8s_CONTEXT__FOR_CONSUL_CLIENT1>
-export EKS_CLUSTER_CLIENT1_CTX=<YOUR_K8s_CONTEXT__FOR_CONSUL_CLIENT2>
+export EKS_CLUSTER_CLIENT2_CTX=<YOUR_K8s_CONTEXT__FOR_CONSUL_CLIENT2>
 ```
 
 3) Add/Update consul repo
