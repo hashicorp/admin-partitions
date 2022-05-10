@@ -35,7 +35,7 @@ helm repo add hashicorp https://helm.releases.hashicorp.com
 helm repo update 
 ```
 
-4) Set Consul context to point to the K8s cluster for the Consul server.
+4) Set Consul context to point to the K8s cluster of the Consul server.
 
 ```
 kubectl config use-context $CLUSTER_SERVER_CTX
@@ -150,7 +150,7 @@ kubectl get secret consul-consul-ca-key --context $CLUSTER_SERVER_CTX -o yaml | 
 kubectl get secret consul-consul-partitions-acl-token --context $CLUSTER_SERVER_CTX -o json | kubectl apply --context $CLUSTER_CLIENT1_CTX -f -
 ```
 
-11) Set Consul context to point to the K8s cluster for the Consul server.
+11) Set Consul context to point to the K8s cluster of the first Consul client.
 ```
 kubectl config use-context $CLUSTER_CLIENT1_CTX
 ```
@@ -242,7 +242,7 @@ dns:
 EOF
 ```
 
-11) Copy tls cert/keys and partition acl tokens from Consul server cluster to the client cluster. This is needed if tls and acls are enabled.
+16) Copy tls cert/keys and partition acl tokens from Consul server cluster to the client cluster. This is needed if tls and acls are enabled.
 
 ```
 kubectl get secret consul-consul-ca-cert --context $CLUSTER_SERVER_CTX -o yaml | kubectl apply --context $CLUSTER_CLIENT2_CTX -f -
@@ -251,18 +251,18 @@ kubectl get secret consul-consul-partitions-acl-token --context $CLUSTER_SERVER_
 ```
 
 
-11) Set Consul context to point to the K8s cluster for the Consul server.
+17) Set Consul context to point to the K8s cluster for the Consul server.
 
 ```
 kubectl config use-context $CLUSTER_CLIENT2_CTX
 ```
 
-12) Add Consul Ent license as a K8s secret
+18) Add Consul Ent license as a K8s secret
 ```
 kubectl create secret generic license --from-literal=key=$CONSUL_LICENSE
 ```
 
-16) Deploy Consul
+19) Deploy Consul
 ```
 helm install consul hashicorp/consul -f helm-client-team2.yaml --version=0.43.0 --wait --debug
 ```
@@ -283,7 +283,7 @@ vanphan@vanphan-F664JHFD6G 1.11GA %
 
 # View UI
 
-17) To view the Consul UI with a browser, use the EXTERNAL-IP of the consul ui service. 
+20) To view the Consul UI with a browser, use the EXTERNAL-IP of the consul ui service. 
 
 Note: TLS is enabled in this example, therefore use https:// with port 443.
 
@@ -303,28 +303,28 @@ kubectl get secrets/consul-consul-bootstrap-acl-token --template='{{.data.token 
 
 This is an example showing a simple app that has a frontend service in the "team1" partition that connects to a backend service in thw "team1" partition. We will run through the steps manually so show you exactly how it works.
 
-18) Deploy frontend app.
+21) Deploy frontend app.
 ```
 kubectl apply -f apps/fakeapp/frontend.yaml --context $CLUSTER_CLIENT1_CTX 
 ```
 
-19) Deploy backend app.
+22) Deploy backend app.
 ```
 kubectl apply -f apps/fakeapp/backend.yaml --context $CLUSTER_CLIENT2_CTX
 ```
 You should notice the backend service appear in the UI -> Services window from the team2 partition.
 
-20) Export services from partition "team2" to parition "team1".
+23) Export services from partition "team2" to parition "team1".
 ```
 kubectl apply -f apps/fakeapp/export-back.yaml --context $CLUSTER_CLIENT2_CTX
 ```
 
-21) (Optional) This step is only needed if you are connecting services in partitions that belong in different non-routable VPC/subnets. If so,  
+24) (Optional) This step is only needed if you are connecting services in partitions that belong in different non-routable VPC/subnets. If so,  
 ```export services from partition "team1" to parition "team2".
 kubectl apply -f apps/fakeapp/export-front.yaml --context $CLUSTER_CLIENT1_CTX   
 ```
 
-22) (Optional) This step is only needed if you are connecting services in partitions that belong in different non-routable VPC/subnets.
+25) (Optional) This step is only needed if you are connecting services in partitions that belong in different non-routable VPC/subnets.
 If so, Deploy Proxy-default (or Service-default to specify granular service) to send frontend traffic to Mesh GW.
 kubectl apply -f proxydefault.yaml --context $CLUSTER_CLIENT1_CTX   
 
@@ -335,7 +335,7 @@ Include Mesh GWs in exported-service config entries for both export-back.yaml an
 Reapply the export files from previous Step 3 + 4
 
 
-23) View fakeapp service using EXTERNAL-IP:
+26) View fakeapp service using EXTERNAL-IP:
 ```
 kubectl get service frontend --context $CLUSTER_CLIENT1_CTX
 ```
