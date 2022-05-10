@@ -269,7 +269,7 @@ helm install consul hashicorp/consul -f helm-client-team2.yaml --version=0.43.0 
 
 Example output of successful deployment:
 ```
-kubectl get pod --context $EKS_CLUSTER_CLIENT2_CTX
+kubectl get pod --context $CLUSTER_CLIENT2_CTX
 NAME                                                 READY   STATUS    RESTARTS   AGE
 backend-7fc9d878cd-k8f2j                             2/2     Running   0          74m
 consul-consul-client-pbwlz                           1/1     Running   0          88m
