@@ -1,5 +1,6 @@
-# Here are the high level steps to deploy Consul with Admin Partitions onto AKS.
+# Steps to deploy Consul with Admin Partitions onto AKS clusters.
 
+This repo will guide you through deploying Consul onto three Kubernetes clusters to demonstrate Consul's multi-tenancy feature, Administrative Partitions. You will deploy the Consul server in one K8s cluster and two Consul clients on the other two K8s clusters. Each Consul client will represent a different tenant.
 
 # Pre-reqs
 
@@ -9,7 +10,8 @@
 
 2) Deploy 3 AKS clusters in your Azure envronments. Make sure when you create your AKS clusters that you are selecting the Azure CNI (instead of Kubenet)
     
-    
+3) A Consul Enterprise license. You can request a 30 day trial license here: https://www.hashicorp.com/products/consul/trial
+   
     
 # Deploy Consul Server
 
@@ -298,6 +300,10 @@ For demo purposes, you can use the boostrap ACL token to log ontn UI. Token can 
 kubectl get secrets/consul-consul-bootstrap-acl-token --template='{{.data.token | base64decode }}' --context $CLUSTER_SERVER_CTX
 ```
 
+Notice that additional partitions are now visible in the Admin Partition pull-down menu.
+
+
+
 # CROSS PARTITION COMMUNICATION
 
 
@@ -319,19 +325,21 @@ You should notice the backend service appear in the UI -> Services window from t
 kubectl apply -f apps/fakeapp/export-back.yaml --context $CLUSTER_CLIENT2_CTX
 ```
 
-24) (Optional) This step is only needed if you are connecting services in partitions that belong in different non-routable VPC/subnets. If so,  
+24) (Optional) This step is only needed if you are connecting services in partitions that belong in different non-routable VPC/subnets. If so, run command below.
+  
 ```export services from partition "team1" to parition "team2".
 kubectl apply -f apps/fakeapp/export-front.yaml --context $CLUSTER_CLIENT1_CTX   
 ```
 
 25) (Optional) This step is only needed if you are connecting services in partitions that belong in different non-routable VPC/subnets.
 If so, Deploy Proxy-default (or Service-default to specify granular service) to send frontend traffic to Mesh GW.
+```
 kubectl apply -f proxydefault.yaml --context $CLUSTER_CLIENT1_CTX   
-
+```
 You will also need to do the following:
 
-Deploy mesh GW using helm charts for each K8s Consul client clusters.
-Include Mesh GWs in exported-service config entries for both export-back.yaml and export-back.yaml files
+a) Add the mesh GW in the Consul client helm values files for each K8s Consul client clusters, and then use ```helm upgrade``` to update the Consul client deployment.
+b) Include Mesh GWs in exported-service config entries for both export-back.yaml and export-front.yaml files
 Reapply the export files from previous Step 3 + 4
 
 
