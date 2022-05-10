@@ -352,6 +352,6 @@ Open browser and enter the EXTERNAL-IP address and append port 9090 and /ui path
 
 ```http://<EXTERNAL-IP>:9090/ui```
 
-   You should see two boxes in grey color, depicting that there is connectivity. If the boxes are in red, that means the frontend service is not able to reach the backend service.
+   You should see two boxes in white color, depicting that there is connectivity. If the boxes are red, that means the frontend service is not able to reach the backend service.
    
 ![alt text](https://github.com/hashicorp/admin-partitions/blob/main/images/Screen%20Shot%202022-05-10%20at%208.40.28%20AM.png)
