@@ -77,12 +77,12 @@ consul-consul-webhook-cert-manager-9d4f5fbd9-7k45t   1/1     Running   0        
 export CONSUL_PARTITION_SVC=$(kubectl get services consul-consul-partition --context $CLUSTER_SERVER_CTX -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 ```
 
-8) Retrieve the Kubernetes API server from the Kubernetes **Client 1** Cluster and send the output into an environmental variable. We will use this variable when we configure the Consul Client yaml file.
+8) Retrieve the Kubernetes API server from the Kubernetes **Client 1** cluster and send the output into an environmental variable. We will use this variable when we configure the Consul client yaml file.
 
 ```
 export K8S_AUTH_HOST_CLIENT1=$(kubectl config view -o jsonpath="{.clusters[?(@.name=='$CLUSTER_CLIENT1_CTX')].cluster.server}" | sed 's/https:\/\///' | sed 's/:443//')
 ```
-9) Generate the Consul Client cluster yaml file.
+9) Generate the Consul client 1 cluster yaml file.
 
 Note: The partition name will be ```team1```. If you wish to use a different partition name, you can change the ```global.adminPartitions.name``` parameter below.
 
@@ -177,12 +177,12 @@ consul-consul-webhook-cert-manager-9d4f5fbd9-dvkpb   1/1     Running   0        
 
 # Deploy Consul Client 2
 
-14) Retreieve the Kubernetes API server from the Kubernetes **Client 2** Cluster and send the output into an environmental variable. We will use this variable when we configure the Consul Client yaml file.
+14) Retrieve the Kubernetes API server from the Kubernetes **Client 2** cluster and send the output into an environmental variable. We will use this variable when we configure the Consul client yaml file.
 
 ```
 export K8S_AUTH_HOST_CLIENT2=$(kubectl config view -o jsonpath="{.clusters[?(@.name=='$CLUSTER_CLIENT2_CTX')].cluster.server}" | sed 's/https:\/\///' | sed 's/:443//')
 ```
-15) Generate the Consul Client cluster yaml file.
+15) Generate the Consul client 2 cluster yaml file.
 
 Note: The partition name will be ```team2```. If you wish to use a different paftition name, you can change the ```adminPartitions.name``` parameter below.
 
