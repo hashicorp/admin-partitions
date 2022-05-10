@@ -302,7 +302,7 @@ kubectl get secrets/consul-consul-bootstrap-acl-token --template='{{.data.token 
 
 Notice that additional partitions are now visible in the Admin Partition pull-down menu.
 
-
+![alt text](https://github.com/hashicorp/admin-partitions/blob/main/images/Screen%20Shot%202022-05-10%20at%208.52.17%20AM.png)
 
 # CROSS PARTITION COMMUNICATION
 
@@ -354,4 +354,4 @@ Open browser and enter the EXTERNAL-IP address and append port 9090 and /ui path
 
    You should see two boxes in grey color, depicting that there is connectivity. If the boxes are in red, that means the frontend service is not able to reach the backend service.
    
-   
+![alt text](https://github.com/hashicorp/admin-partitions/blob/main/images/Screen%20Shot%202022-05-10%20at%208.40.28%20AM.png)
