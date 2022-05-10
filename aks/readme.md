@@ -35,7 +35,7 @@ helm repo add hashicorp https://helm.releases.hashicorp.com
 helm repo update 
 ```
 
-4) Set Consul context to point to the K8s cluster of the Consul server.
+4) Set the Kubernetes context to point to the K8s cluster of the Consul server.
 
 ```
 kubectl config use-context $CLUSTER_SERVER_CTX
@@ -150,7 +150,7 @@ kubectl get secret consul-consul-ca-key --context $CLUSTER_SERVER_CTX -o yaml | 
 kubectl get secret consul-consul-partitions-acl-token --context $CLUSTER_SERVER_CTX -o json | kubectl apply --context $CLUSTER_CLIENT1_CTX -f -
 ```
 
-11) Set Consul context to point to the K8s cluster of the first Consul client.
+11) Set the Kubernetes context to point to the K8s cluster of the **first** Consul client.
 ```
 kubectl config use-context $CLUSTER_CLIENT1_CTX
 ```
@@ -251,7 +251,7 @@ kubectl get secret consul-consul-partitions-acl-token --context $CLUSTER_SERVER_
 ```
 
 
-17) Set Consul context to point to the K8s cluster for the Consul server.
+17) Set the Kubernetes context to point to the K8s cluster of the **second** Consul client.
 
 ```
 kubectl config use-context $CLUSTER_CLIENT2_CTX
