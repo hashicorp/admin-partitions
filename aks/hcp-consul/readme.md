@@ -46,11 +46,125 @@ You can click the **Access Consul** dropdown and then click **Download to instal
 
 ![Client download](https://github.com/hashicorp/admin-partitions/blob/main/images/Screen%20Shot%202022-08-22%20at%2012.45.14%20PM.png)
 
-5. Unzip the client config package into the current working directory, and then use ls to confirm that both the client_config.json and ca.pem files are available.
+5. Unzip the client config package into the current working directory, and then use **ls** to confirm that both the client_config.json and ca.pem files are available.
 ```
 ls
 ca.pem             client_config.json
 ```
 
-6. Under “Access your cluster over the public internet", click the copy icon. The HCP Consul dashboard UI link is now in your clipboard. Set this token to the CONSUL_HTTP_ADDR environment variable on your development host so that you can reference it later in the tutorial.
+6. On the HCP portal, go to your HCP Consul cluster. Click on **Access Consul**. Under **Access your cluster over the public interne**, click the copy icon. The HCP Consul dashboard UI link is now in your clipboard. Set this UI link to the CONSUL_HTTP_ADDR environment variable on your development host so that you can reference it later in the tutorial.  
+
+```
+export CONSUL_HTTP_ADDR=<consul_ui_link>
+```
+
 ![hcp](https://github.com/hashicorp/admin-partitions/blob/main/images/Screen%20Shot%202022-08-22%20at%201.00.26%20PM.png)
+
+
+7. On the HCP portal, go to your HCP Consul cluster. Click on **Access Consul**. Select **Generate admin token** and then click the copy icon from the dialog box. A global-management root token is now in your clipboard. Set this token to the CONSUL_HTTP_TOKEN environment variable on your development host so that you can reference it later in the tutorial.
+
+![hcp-admin-token](https://github.com/hashicorp/admin-partitions/blob/main/images/Screen%20Shot%202022-08-22%20at%201.17.50%20PM.png)
+
+8. Use the ca.pem file in the current working directory to create a Kubernetes secret to store the Consul CA certificate.
+```
+kubectl create secret generic "consul-ca-cert" --from-file='tls.crt=./ca.pem'
+```
+
+9. The Consul gossip encryption key is embedded in the client_config.json file that you downloaded and extracted into your current directory. Issue the following command to create a Kubernetes secret that stores the Consul gossip key encryption key. The following command uses jq to extract the value from the client_config.json file.
+
+```
+kubectl create secret generic "consul-gossip-key" --from-literal="key=$(jq -r .encrypt client_config.json)" --namespace consul
+```
+
+10. The last secret you need to add is an ACL bootstrap token. You can use the one you set to your CONSUL_HTTP_TOKEN environment variable earlier. Issue the following command to create a Kubernetes secret to store the bootstrap ACL token.
+```
+kubectl create secret generic "consul-bootstrap-token" --from-literal="token=${CONSUL_HTTP_TOKEN}" --namespace consul
+```
+
+# Create Consul configuration file for Team 1
+
+11.  Issue the following command to set the DATACENTER environment variable, extracted from the client_config.json file. This env variable will be used in your Consul helm value file.
+
+```
+export DATACENTER=$(jq -r .datacenter client_config.json)
+```
+
+12. Extract the private server URL from the client_config.json file so that it can be set in the Helm values file as the *externalServers:hosts entry*. 
+```
+export RETRY_JOIN=$(jq -r --compact-output .retry_join client_config.json)
+```
+
+13. Extract the public server URL from the client_config.json file so that it can be set in the Helm values file as the **k8sAuthMethodHost** entry.
+
+```
+kubectl config use-context $CLUSTER_CLIENT1_CTX
+```
+
+```
+export KUBE_API_URL=$(kubectl config view -o jsonpath="{.clusters[?(@.name == \"$(kubectl config current-context)\")].cluster.server}")
+```
+
+14. Validate that your environment variables are correct.
+```
+echo $DATACENTER && \
+echo $RETRY_JOIN && \
+echo $KUBE_API_URL
+```
+The output should look similar to the following:
+```
+dc1
+["servers-private-consul-f3239351.7171f9f3.z1.hashicorp.cloud"]
+https://dc1-k8s-9f690a3c.hcp.westus2.azmk8s.io:443
+```
+
+
+15. Run the following command to generate the Helm values file. Notice the environment variables *${DATACENTER}*, *${KUBE_API_URL}*, and *${RETRY_JOIN}* will be used to reflect your specific AKS cluster values. 
+```
+cat > config-team1.yaml << EOF
+global:
+  name: consul
+  enabled: false
+  datacenter: ${DATACENTER}
+  enableConsulNamespaces: true
+  adminPartitions:
+    enabled: true
+    name: "team1"  
+  acls:
+    manageSystemACLs: true
+    bootstrapToken:
+      secretName: consul-bootstrap-token
+      secretKey: token
+  gossipEncryption:
+    secretName: consul-gossip-key
+    secretKey: key
+  tls:
+    enabled: true
+    enableAutoEncrypt: true
+    caCert:
+      secretName: consul-ca-cert
+      secretKey: tls.crt
+  enableConsulNamespaces: true
+
+externalServers:
+  enabled: true
+  hosts: ${RETRY_JOIN}
+  httpsPort: 443
+  useSystemRoots: true
+  k8sAuthMethodHost: ${KUBE_API_URL}
+
+client:
+  enabled: true
+  join: ${RETRY_JOIN}
+
+connectInject:
+  enabled: true
+
+controller:
+  enabled: true
+
+meshGateway:
+  enabled: true
+  replicas: 1
+
+EOF
+```
