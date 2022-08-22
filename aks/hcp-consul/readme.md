@@ -311,3 +311,46 @@ consul-webhook-cert-manager-cvbfghb564-cbfg54  1/1     Running   0          1m
 
 Next, we will deploy a simple application that has a frontend and a backend. We will deploy the frontend onto the **team1** partition and the backend onto the **team2** partition. 
 
+We will run through the steps manually so show you exactly how it works.
+ 
+   
+1) Deploy frontend app.
+```
+kubectl apply -f apps/fakeapp/frontend.yaml --context $CLUSTER_CLIENT1_CTX
+```
+   You should notice the frontend service appear in the Consul UI -> Services window from the team1 partition.
+
+2) Deploy backend app.
+```
+kubectl apply -f apps/fakeapp/backend.yaml --context $CLUSTER_CLIENT2_CTX
+```   
+   You should notice the backend service appear in the Consul UI -> Services window from the team2 partition.
+
+3) Export services from partition "team2" to parition "team1".
+``` 
+kubectl apply -f apps/fakeapp/export-back.yaml --context $EKS_CLUSTER_CLIENT2_CTX
+```   
+   
+4) Export services from partition "team1" to parition "team2".
+```   
+kubectl apply -f apps/fakeapp/export-front.yaml --context $EKS_CLUSTER_CLIENT1_CTX   
+```   
+
+5) Deploy Proxy-default (or Service-default to specify granular service) to send frontend traffic to Mesh GW.
+```
+kubectl apply -f proxydefault.yaml --context $EKS_CLUSTER_CLIENT1_CTX   
+```
+
+6) View fakeapp service using EXTERNAL-IP:
+```
+kubectl get service frontend --context $CLUSTER_CLIENT1_CTX
+```
+   Open browser and enter the EXTERNAL-IP address and append port 9090 and /ui path to the URL.
+   Note: Note: AWS may take a few mins for the EXTERNAL-IP DNS name to resolve. Give it some time.
+```   
+http://<EXTERNAL-IP>:9090/ui
+```   
+  You should see two boxes in grey color, depicting that there is connectivity. 
+  If the boxes are in red, that means the frontend service is not able to reach the backend service.
+
+
