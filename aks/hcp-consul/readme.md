@@ -16,6 +16,7 @@ If you deployed HCP Consul from the HCP Web UI the steps in this repo are simila
 2. Ensure you followed provided steps to peer network connections between the HCP HashiCorp Vritual network (HVN) and your own VNET.
 3. Ensure you have followed provided steps to route traffic through your peering connections.
 4. Deploy 2 AKS clusters in your Azure envronments. Make sure when you create your AKS clusters that you are selecting the Azure CNI (instead of Kubenet)
+5. Ensure you have helm installed on your machine. We will use helm to install the Consul clients to your AKS clusters.
 
 # Deploy Consul Clients on AKS
 
@@ -69,7 +70,8 @@ The HCP Consul dashboard UI link is now in your clipboard. Set this UI link to t
 export CONSUL_HTTP_ADDR=<Consul_dashboard_ui_link>
 ```
 
-7. On the HCP portal, go to your HCP Consul cluster. 
+7. On the HCP portal, go to your HCP Consul cluster.  
+
 ![hcp-admin-token](https://github.com/hashicorp/admin-partitions/blob/main/images/Screen%20Shot%202022-08-22%20at%201.17.50%20PM.png)
 
 
@@ -272,7 +274,7 @@ EOF
 
 
    
-# Deploy Consul for Team 1 
+# Deploy Consul for each team 
 
 17. Open a browser and go to the Consul UI using the Consul UI's Public IP address obtained earlier. The public IP address should also be in your environment variable CONSUL_HTTP_ADDR.
 ```
@@ -350,29 +352,29 @@ We will run through the steps manually so show you exactly how it works.
    
 1) Deploy frontend app.
 ```
-kubectl apply -f apps/fakeapp/frontend.yaml --context $CLUSTER_CLIENT1_CTX
+kubectl apply -f fakeapp/frontend.yaml --context $CLUSTER_CLIENT1_CTX
 ```
    You should notice the frontend service appear in the Consul UI -> Services window from the team1 partition.
 
 2) Deploy backend app.
 ```
-kubectl apply -f apps/fakeapp/backend.yaml --context $CLUSTER_CLIENT2_CTX
+kubectl apply -f fakeapp/backend.yaml --context $CLUSTER_CLIENT2_CTX
 ```   
    You should notice the backend service appear in the Consul UI -> Services window from the team2 partition.
 
 3) Export services from partition "team2" to parition "team1".
 ``` 
-kubectl apply -f apps/fakeapp/export-back.yaml --context $EKS_CLUSTER_CLIENT2_CTX
+kubectl apply -f fakeapp/export-back.yaml --context $CLUSTER_CLIENT2_CTX
 ```   
    
 4) Export services from partition "team1" to parition "team2".
 ```   
-kubectl apply -f apps/fakeapp/export-front.yaml --context $EKS_CLUSTER_CLIENT1_CTX   
+kubectl apply -f fakeapp/export-front.yaml --context $CLUSTER_CLIENT1_CTX   
 ```   
 
 5) Deploy Proxy-default (or Service-default to specify granular service) to send frontend traffic to Mesh GW.
 ```
-kubectl apply -f proxydefault.yaml --context $EKS_CLUSTER_CLIENT1_CTX   
+kubectl apply -f fakeapp/proxydefault.yaml --context $CLUSTER_CLIENT1_CTX   
 ```
 
 6) View fakeapp service using EXTERNAL-IP:
