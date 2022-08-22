@@ -26,10 +26,13 @@ Once your HCP Consul isa deployed and you've peered and routed your VNET, you ca
 az login
 ```
 
-2. Connect your local machine's terminal to your AKS cluster.
+2. Connect your local machine's terminal to your two AKS clusters.
+
+First AKS cluster:
 ```
 az aks get-credentials --resource-group <Your-Azure-Resource-Group> --name <Your-first-AKS-cluster>
 ```
+Second AKS cluster:
 ```
 az aks get-credentials --resource-group <Your-Azure-Resource-Group> --name <Your-second-AKS-cluster>
 ```
