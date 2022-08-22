@@ -81,9 +81,9 @@ kubectl create secret generic "consul-gossip-key" --from-literal="key=$(jq -r .e
 kubectl create secret generic "consul-bootstrap-token" --from-literal="token=${CONSUL_HTTP_TOKEN}" --namespace consul
 ```
 
-# Create Consul configuration file for Team 1
+# Create Consul configuration files for each team
 
-11.  Issue the following command to set the DATACENTER environment variable, extracted from the client_config.json file. This env variable will be used in your Consul helm value file.
+11.  Issue the following command to set the HCP Consul cluster DATACENTER environment variable, extracted from the client_config.json file. This env variable will be used in your Consul helm value file.
 
 ```
 export DATACENTER=$(jq -r .datacenter client_config.json)
@@ -101,24 +101,37 @@ kubectl config use-context $CLUSTER_CLIENT1_CTX
 ```
 
 ```
-export KUBE_API_URL=$(kubectl config view -o jsonpath="{.clusters[?(@.name == \"$(kubectl config current-context)\")].cluster.server}")
+export KUBE_API_URL_Team1=$(kubectl config view -o jsonpath="{.clusters[?(@.name == \"$(kubectl config current-context)\")].cluster.server}")
 ```
+
+```
+kubectl config use-context $CLUSTER_CLIENT2_CTX
+```
+
+```
+export KUBE_API_URL_Team2=$(kubectl config view -o jsonpath="{.clusters[?(@.name == \"$(kubectl config current-context)\")].cluster.server}")
+```
+
 
 14. Validate that your environment variables are correct.
 ```
 echo $DATACENTER && \
 echo $RETRY_JOIN && \
-echo $KUBE_API_URL
+echo $KUBE_API_URL_Team1 && \
+echo $KUBE_API_URL_Team2
 ```
 The output should look similar to the following:
 ```
-dc1
+consul-cluster-demo
 ["servers-private-consul-f3239351.7171f9f3.z1.hashicorp.cloud"]
 https://dc1-k8s-9f690a3c.hcp.westus2.azmk8s.io:443
+https://dc2-k8s-123456dd.hcp.westus2.azmk8s.io:443
 ```
 
+15. Run the following command to generate the Helm values file for **Team 1**. Notice the environment variables *${DATACENTER}*, *${KUBE_API_URL}*, and *${RETRY_JOIN}* will be used to reflect your specific AKS cluster values.  
 
-15. Run the following command to generate the Helm values file. Notice the environment variables *${DATACENTER}*, *${KUBE_API_URL}*, and *${RETRY_JOIN}* will be used to reflect your specific AKS cluster values. 
+Also notice the partition name is team1.
+
 ```
 cat > config-team1.yaml << EOF
 global:
@@ -150,7 +163,7 @@ externalServers:
   hosts: ${RETRY_JOIN}
   httpsPort: 443
   useSystemRoots: true
-  k8sAuthMethodHost: ${KUBE_API_URL}
+  k8sAuthMethodHost: ${KUBE_API_URL_Team1}
 
 client:
   enabled: true
@@ -168,3 +181,133 @@ meshGateway:
 
 EOF
 ```
+
+16. Run the following command to generate the Helm values file for **Team 2**. Notice the environment variables *${DATACENTER}*, *${KUBE_API_URL}*, and *${RETRY_JOIN}* will be used to reflect your specific AKS cluster values. 
+
+Also notice the partition name is team2.
+
+```
+cat > config-team2.yaml << EOF
+global:
+  name: consul
+  enabled: false
+  datacenter: ${DATACENTER}
+  enableConsulNamespaces: true
+  adminPartitions:
+    enabled: true
+    name: "team2"  
+  acls:
+    manageSystemACLs: true
+    bootstrapToken:
+      secretName: consul-bootstrap-token
+      secretKey: token
+  gossipEncryption:
+    secretName: consul-gossip-key
+    secretKey: key
+  tls:
+    enabled: true
+    enableAutoEncrypt: true
+    caCert:
+      secretName: consul-ca-cert
+      secretKey: tls.crt
+  enableConsulNamespaces: true
+
+externalServers:
+  enabled: true
+  hosts: ${RETRY_JOIN}
+  httpsPort: 443
+  useSystemRoots: true
+  k8sAuthMethodHost: ${KUBE_API_URL_Team2}
+
+client:
+  enabled: true
+  join: ${RETRY_JOIN}
+
+connectInject:
+  enabled: true
+
+controller:
+  enabled: true
+
+meshGateway:
+  enabled: true
+  replicas: 1
+
+EOF
+```  
+
+
+   
+# Deploy Consul for Team 1 
+
+17. Open a browser and go to the Consul UI using the Consul UI's Public IP address obtained earlier. The public IP address should also be in your environment variable CONSUL_HTTP_ADDR.
+```
+echo $CONSUL_HTTP_ADDR
+```
+ 
+18. On the Consul UI, click on **Admin Partitions** and select **Manage Partitions**.
+
+19. Click **Create** and two new partitions called **team1** and **team2**.  
+
+**Important:** You can change the name of the partition, but it must match the partition names set in your config-team1.yaml and config-team2.yaml file generated in the steps earlier.
+
+
+20. Now we can deploy the Consul clients into each partitions.  
+Add HashiCorp to your helm repo
+```
+helm repo add hashicorp https://helm.releases.hashicorp.com
+```
+
+21. Deploy Consul client for team 1.
+
+```
+kubectl config use-context $CLUSTER_CLIENT1_CTX
+```
+
+```
+helm install consul hashicorp/consul --values config-team1.yaml --version "0.43.0" --set global.image=hashicorp/consul-enterprise:1.12.0-ent
+```
+22. Confirm the Consul client pods are up.
+
+```
+kubectl get pod --context $CLUSTER_CLIENT1_CTX
+NAME                                           READY   STATUS    RESTARTS   AGE
+consul-client-4qrkn                            1/1     Running   0          1m
+consul-connect-injector-7c4fd8cbfc-www24       1/1     Running   0          1m
+consul-connect-injector-7c4fd8cbfc-zcknn       1/1     Running   0          1m
+consul-controller-86c756d855-t5m7d             1/1     Running   0          1m
+consul-mesh-gateway-74d77f9859-l4kp9           2/2     Running   0          1m
+consul-webhook-cert-manager-6567fdccb7-fdthp   1/1     Running   0          1m
+```
+
+23. Deploy Consul client for team 2.
+
+```
+kubectl config use-context $CLUSTER_CLIENT2_CTX
+```
+
+```
+helm install consul hashicorp/consul --values config-team2.yaml --version "0.43.0" --set global.image=hashicorp/consul-enterprise:1.12.0-ent
+```
+
+24. Confirm the Consul client pods are up.
+
+```
+kubectl get pod --context $CLUSTER_CLIENT2_CTX
+NAME                                           READY   STATUS    RESTARTS   AGE
+consul-client-fbg67                            1/1     Running   0          1m
+consul-connect-injector-ssdf73fbsfk1-23453     1/1     Running   0          1m
+consul-connect-injector-ssdf73fbsfk1-zddew     1/1     Running   0          1m
+consul-controller-gfdgdfgdr4-e5tgd             1/1     Running   0          1m
+consul-mesh-gateway-45gdg45gtr-dfgdd           2/2     Running   0          1m
+consul-webhook-cert-manager-cvbfghb564-cbfg54  1/1     Running   0          1m
+```
+  
+  
+25. On your Consul UI, the Service and Node tabs should reflect new nodes and a Mesh Gateway service in each partition. 
+
+
+# Deploy services onto each partition.
+
+Next, we will deploy a simple application that has a frontend and a backend. We will deploy the frontend onto the **team1** partition and the backend onto the **team2** partition. 
+
