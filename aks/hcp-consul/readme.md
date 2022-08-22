@@ -55,18 +55,33 @@ ls
 ca.pem             client_config.json
 ```
 
-6. On the HCP portal, go to your HCP Consul cluster. Click on **Access Consul**. Under **Access your cluster over the public interne**, click the copy icon. The HCP Consul dashboard UI link is now in your clipboard. Set this UI link to the CONSUL_HTTP_ADDR environment variable on your development host so that you can reference it later in the tutorial.  
-
-```
-export CONSUL_HTTP_ADDR=<consul_ui_link>
-```
+6. On the HCP portal, go to your HCP Consul cluster. 
 
 ![hcp](https://github.com/hashicorp/admin-partitions/blob/main/images/Screen%20Shot%202022-08-22%20at%201.00.26%20PM.png)
 
+- Click on **Access Consul**. 
+- Click on **Public**
+- Under **Access your cluster over the public internet**, click the copy icon.  
 
-7. On the HCP portal, go to your HCP Consul cluster. Click on **Access Consul**. Select **Generate admin token** and then click the copy icon from the dialog box. A global-management root token is now in your clipboard. Set this token to the CONSUL_HTTP_TOKEN environment variable on your development host so that you can reference it later in the tutorial.
+The HCP Consul dashboard UI link is now in your clipboard. Set this UI link to the CONSUL_HTTP_ADDR environment variable on your terminal so that you can reference it later in the tutorial.  
 
+```
+export CONSUL_HTTP_ADDR=<Consul_dashboard_ui_link>
+```
+
+7. On the HCP portal, go to your HCP Consul cluster. 
 ![hcp-admin-token](https://github.com/hashicorp/admin-partitions/blob/main/images/Screen%20Shot%202022-08-22%20at%201.17.50%20PM.png)
+
+
+- Click on **Access Consul**. 
+- Select **Generate admin token** and then click the copy icon from the dialog box. 
+- A global-management root token is now in your clipboard. 
+ 
+Set this token to the CONSUL_HTTP_TOKEN environment variable on your terminal so that you can reference it later in the tutorial.
+
+```
+export CONSUL_HTTP_TOKEN=<Consul_root_token>
+```
 
 8. Use the ca.pem file in the current working directory to create a Kubernetes secret to store the Consul CA certificate.
 ```
