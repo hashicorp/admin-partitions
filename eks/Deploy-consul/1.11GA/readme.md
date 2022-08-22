@@ -175,24 +175,16 @@ kubectl apply -f apps/fakeapp/backend.yaml --context $EKS_CLUSTER_CLIENT2_CTX
 kubectl apply -f apps/fakeapp/export-back.yaml --context $EKS_CLUSTER_CLIENT2_CTX
 ```   
    
-4) (Optional) This step is only needed if you are connecting services in partitions that belong in different non-routable VPC/subnets. 
-   If so, export services from partition "team1" to parition "team2".
+4) Export services from partition "team1" to parition "team2".
 ```   
 kubectl apply -f apps/fakeapp/export-front.yaml --context $EKS_CLUSTER_CLIENT1_CTX   
 ```   
 
 
-5) (Optional) This step is only needed if you are connecting services in partitions that belong in different non-routable VPC/subnets.  
-   If so, Deploy Proxy-default (or Service-default to specify granular service) to send frontend traffic to Mesh GW.
+5) Deploy Proxy-default (or Service-default to specify granular service) to send frontend traffic to Mesh GW.
 ```
 kubectl apply -f proxydefault.yaml --context $EKS_CLUSTER_CLIENT1_CTX   
 ```
-   You will also need to do the following:
-   
-- Deploy mesh GW using helm charts for each K8s Consul client clusters. 
-- Include Mesh GWs in exported-service config entries for both ```export-back.yaml``` and ```export-back.yaml``` files 
-- Reapply the export files from previous Step 3 + 4
-
 
 
 6) View fakeapp service using EXTERNAL-IP:
