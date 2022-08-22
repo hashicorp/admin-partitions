@@ -43,8 +43,8 @@ connectInject:
 controller:
   enabled: true
 
-#meshGateway:
-#  enabled: true
+meshGateway:
+  enabled: true
 
 dns:
   enabled: true
