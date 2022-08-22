@@ -83,20 +83,36 @@ Set this token to the CONSUL_HTTP_TOKEN environment variable on your terminal so
 export CONSUL_HTTP_TOKEN=<Consul_root_token>
 ```
 
-8. Use the ca.pem file in the current working directory to create a Kubernetes secret to store the Consul CA certificate.
+8. Use the ca.pem file in the current working directory to create a Kubernetes secret to store the Consul CA certificate. We will run this for both AKS clusters.
 ```
-kubectl create secret generic "consul-ca-cert" --from-file='tls.crt=./ca.pem'
+kubectl create secret generic "consul-ca-cert" --from-file='tls.crt=./ca.pem' --context $CLUSTER_CLIENT1_CTX
 ```
-
-9. The Consul gossip encryption key is embedded in the client_config.json file that you downloaded and extracted into your current directory. Issue the following command to create a Kubernetes secret that stores the Consul gossip key encryption key. The following command uses jq to extract the value from the client_config.json file.
-
 ```
-kubectl create secret generic "consul-gossip-key" --from-literal="key=$(jq -r .encrypt client_config.json)" --namespace consul
+kubectl create secret generic "consul-ca-cert" --from-file='tls.crt=./ca.pem' --context $CLUSTER_CLIENT2_CTX
 ```
 
-10. The last secret you need to add is an ACL bootstrap token. You can use the one you set to your CONSUL_HTTP_TOKEN environment variable earlier. Issue the following command to create a Kubernetes secret to store the bootstrap ACL token.
+
+9. The Consul gossip encryption key is embedded in the client_config.json file that you downloaded and extracted into your current directory. Issue the following command to create a Kubernetes secret that stores the Consul gossip key encryption key. The following command uses jq to extract the value from the client_config.json file.  
+
+We will run this for both AKS clusters.  
+
 ```
-kubectl create secret generic "consul-bootstrap-token" --from-literal="token=${CONSUL_HTTP_TOKEN}" --namespace consul
+kubectl create secret generic "consul-gossip-key" --from-literal="key=$(jq -r .encrypt client_config.json)"  --context $CLUSTER_CLIENT1_CTX
+```
+
+```
+kubectl create secret generic "consul-gossip-key" --from-literal="key=$(jq -r .encrypt client_config.json)"  --context $CLUSTER_CLIENT2_CTX
+```
+
+10. The last secret you need to add is an ACL bootstrap token. You can use the one you set to your CONSUL_HTTP_TOKEN environment variable earlier. Issue the following command to create a Kubernetes secret to store the bootstrap ACL token.  
+
+We will run this for both AKS clusters.  
+
+```
+kubectl create secret generic "consul-bootstrap-token" --from-literal="token=${CONSUL_HTTP_TOKEN}" --context $CLUSTER_CLIENT1_CTX
+```
+```
+kubectl create secret generic "consul-bootstrap-token" --from-literal="token=${CONSUL_HTTP_TOKEN}" --context $CLUSTER_CLIENT2_CTX
 ```
 
 # Create Consul configuration files for each team
