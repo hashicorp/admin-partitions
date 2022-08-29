@@ -38,12 +38,12 @@ cd /admin-partitions/aks/deploy-on-hcp-consul-azure-aks
 
 
 
-1. Login from your terminal to your Azure account. 
+3. Login from your terminal to your Azure account. 
 ```
 az login
 ```
 
-2. Connect your local machine's terminal to your two AKS clusters.
+4. Connect your local machine's terminal to your two AKS clusters.
 
 First AKS cluster:
 ```
@@ -54,23 +54,23 @@ Second AKS cluster:
 az aks get-credentials --resource-group <Your-Azure-Resource-Group> --name <Your-second-AKS-cluster>
 ```
 
-3. Set environment variables for your two AKS clusters.
+5. Set environment variables for your two AKS clusters.
 ```
 export CLUSTER_CLIENT1_CTX=<Your_First_AKS_Cluster>
 export CLUSTER_CLIENT2_CTX=<Your_Second_AKS_Cluster>
 ```
 
-4. On the HCP portal, go to your HCP Consul cluster and download the client files.  
+6. On the HCP portal, go to your HCP Consul cluster and download the client files.  
 You can click the **Access Consul** dropdown and then click **Download to install Client Agents** to download a zip archive that contains the necessary files to join your client agents to the cluster.  
 
 
 ![Client download](https://github.com/hashicorp/admin-partitions/blob/main/images/Screen%20Shot%202022-08-22%20at%2012.45.14%20PM.png)
 
-5. Unzip the client config package and use **ls** to confirm that both the client_config.json and ca.pem files are available.  
+7. Unzip the client config package and use **ls** to confirm that both the client_config.json and ca.pem files are available.  
   Then copy files into your ```/admin-partitions/aks/deploy-on-hcp-consul-azure-aks``` working directory.  
   
 
-6. On the HCP portal, go to your HCP Consul cluster. 
+8. On the HCP portal, go to your HCP Consul cluster. 
 
 ![hcp](https://github.com/hashicorp/admin-partitions/blob/main/images/Screen%20Shot%202022-08-22%20at%201.00.26%20PM.png)
 
@@ -84,7 +84,7 @@ The HCP Consul dashboard UI link is now in your clipboard. Set this UI link to t
 export CONSUL_HTTP_ADDR=<Consul_dashboard_ui_link>
 ```
 
-7. On the HCP portal, go to your HCP Consul cluster.  
+9. On the HCP portal, go to your HCP Consul cluster.  
 
 ![hcp-admin-token](https://github.com/hashicorp/admin-partitions/blob/main/images/Screen%20Shot%202022-08-22%20at%201.17.50%20PM.png)
 
@@ -99,7 +99,7 @@ Set this token to the CONSUL_HTTP_TOKEN environment variable on your terminal so
 export CONSUL_HTTP_TOKEN=<Consul_root_token>
 ```
 
-8. Use the ca.pem file in the current working directory to create a Kubernetes secret to store the Consul CA certificate. We will run this for both AKS clusters.
+10. Use the ca.pem file in the current working directory to create a Kubernetes secret to store the Consul CA certificate. We will run this for both AKS clusters.
 ```
 kubectl create secret generic "consul-ca-cert" --from-file='tls.crt=./ca.pem' --context $CLUSTER_CLIENT1_CTX
 ```
@@ -108,7 +108,7 @@ kubectl create secret generic "consul-ca-cert" --from-file='tls.crt=./ca.pem' --
 ```
 
 
-9. The Consul gossip encryption key is embedded in the client_config.json file that you downloaded and extracted into your current directory. Issue the following command to create a Kubernetes secret that stores the Consul gossip key encryption key. The following command uses jq to extract the value from the client_config.json file.  
+11. The Consul gossip encryption key is embedded in the client_config.json file that you downloaded and extracted into your current directory. Issue the following command to create a Kubernetes secret that stores the Consul gossip key encryption key. The following command uses jq to extract the value from the client_config.json file.  
 
 We will run this for both AKS clusters.  
 
@@ -120,7 +120,7 @@ kubectl create secret generic "consul-gossip-key" --from-literal="key=$(jq -r .e
 kubectl create secret generic "consul-gossip-key" --from-literal="key=$(jq -r .encrypt client_config.json)"  --context $CLUSTER_CLIENT2_CTX
 ```
 
-10. The last secret you need to add is an ACL bootstrap token. You can use the one you set to your CONSUL_HTTP_TOKEN environment variable earlier. Issue the following command to create a Kubernetes secret to store the bootstrap ACL token.  
+12. The last secret you need to add is an ACL bootstrap token. You can use the one you set to your CONSUL_HTTP_TOKEN environment variable earlier. Issue the following command to create a Kubernetes secret to store the bootstrap ACL token.  
 
 We will run this for both AKS clusters.  
 
@@ -133,18 +133,18 @@ kubectl create secret generic "consul-bootstrap-token" --from-literal="token=${C
 
 # Create Consul configuration files for each team
 
-11.  Issue the following command to set the HCP Consul cluster DATACENTER environment variable, extracted from the client_config.json file. This env variable will be used in your Consul helm value file.
+13.  Issue the following command to set the HCP Consul cluster DATACENTER environment variable, extracted from the client_config.json file. This env variable will be used in your Consul helm value file.
 
 ```
 export DATACENTER=$(jq -r .datacenter client_config.json)
 ```
 
-12. Extract the private server URL from the client_config.json file so that it can be set in the Helm values file as the *externalServers:hosts entry*. 
+14. Extract the private server URL from the client_config.json file so that it can be set in the Helm values file as the *externalServers:hosts entry*. 
 ```
 export RETRY_JOIN=$(jq -r --compact-output .retry_join client_config.json)
 ```
 
-13. Extract the public server URL from the client_config.json file so that it can be set in the Helm values file as the **k8sAuthMethodHost** entry.
+15. Extract the public server URL from the client_config.json file so that it can be set in the Helm values file as the **k8sAuthMethodHost** entry.
 
 ```
 kubectl config use-context $CLUSTER_CLIENT1_CTX
@@ -163,7 +163,7 @@ export KUBE_API_URL_Team2=$(kubectl config view -o jsonpath="{.clusters[?(@.name
 ```
 
 
-14. Validate that your environment variables are correct.
+16. Validate that your environment variables are correct.
 ```
 echo $DATACENTER && \
 echo $RETRY_JOIN && \
@@ -178,7 +178,7 @@ https://dc1-k8s-9f690a3c.hcp.westus2.azmk8s.io:443
 https://dc2-k8s-123456dd.hcp.westus2.azmk8s.io:443
 ```
 
-15. Run the following command to generate the Helm values file for **Team 1**. Notice the environment variables *${DATACENTER}*, *${KUBE_API_URL}*, and *${RETRY_JOIN}* will be used to reflect your specific AKS cluster values.  
+17. Run the following command to generate the Helm values file for **Team 1**. Notice the environment variables *${DATACENTER}*, *${KUBE_API_URL}*, and *${RETRY_JOIN}* will be used to reflect your specific AKS cluster values.  
 
 Also notice the partition name is team1.
 
@@ -232,7 +232,7 @@ meshGateway:
 EOF
 ```
 
-16. Run the following command to generate the Helm values file for **Team 2**. Notice the environment variables *${DATACENTER}*, *${KUBE_API_URL}*, and *${RETRY_JOIN}* will be used to reflect your specific AKS cluster values. 
+18. Run the following command to generate the Helm values file for **Team 2**. Notice the environment variables *${DATACENTER}*, *${KUBE_API_URL}*, and *${RETRY_JOIN}* will be used to reflect your specific AKS cluster values. 
 
 Also notice the partition name is team2.
 
@@ -290,26 +290,26 @@ EOF
    
 # Deploy Consul for each team 
 
-17. Open a browser and go to the Consul UI using the Consul UI's Public IP address obtained earlier. The public IP address should also be in your environment variable CONSUL_HTTP_ADDR.
+19. Open a browser and go to the Consul UI using the Consul UI's Public IP address obtained earlier. The public IP address should also be in your environment variable CONSUL_HTTP_ADDR.
 ```
 echo $CONSUL_HTTP_ADDR
 ```
  
-18. On the Consul UI, click on **Admin Partitions** and select **Manage Partitions**.
+20. On the Consul UI, click on **Admin Partitions** and select **Manage Partitions**.
 
-19. Click **Create** and two new partitions called **team1** and **team2**.  
+21. Click **Create** and two new partitions called **team1** and **team2**.  
 
 **Important:** You can change the name of the partition, but it must match the partition names set in your config-team1.yaml and config-team2.yaml file generated in the steps earlier.
 
 
-20. Now we can deploy the Consul clients into each partitions.  
+22. Now we can deploy the Consul clients into each partitions.  
 Add/update HashiCorp to your helm repo
 ```
 helm repo add hashicorp https://helm.releases.hashicorp.com
 helm repo update
 ```
 
-21. Deploy Consul client for team 1.
+23. Deploy Consul client for team 1.
 
 ```
 kubectl config use-context $CLUSTER_CLIENT1_CTX
@@ -318,7 +318,7 @@ kubectl config use-context $CLUSTER_CLIENT1_CTX
 ```
 helm install consul hashicorp/consul --values config-team1.yaml --version "0.43.0" --set global.image=hashicorp/consul-enterprise:1.12.0-ent
 ```
-22. Confirm the Consul client pods are up.
+24. Confirm the Consul client pods are up.
 
 ```
 kubectl get pod --context $CLUSTER_CLIENT1_CTX
@@ -331,7 +331,7 @@ consul-mesh-gateway-74d77f9859-l4kp9           2/2     Running   0          1m
 consul-webhook-cert-manager-6567fdccb7-fdthp   1/1     Running   0          1m
 ```
 
-23. Deploy Consul client for team 2.
+25. Deploy Consul client for team 2.
 
 ```
 kubectl config use-context $CLUSTER_CLIENT2_CTX
@@ -341,7 +341,7 @@ kubectl config use-context $CLUSTER_CLIENT2_CTX
 helm install consul hashicorp/consul --values config-team2.yaml --version "0.43.0" --set global.image=hashicorp/consul-enterprise:1.12.0-ent
 ```
 
-24. Confirm the Consul client pods are up.
+26. Confirm the Consul client pods are up.
 
 ```
 kubectl get pod --context $CLUSTER_CLIENT2_CTX
@@ -355,7 +355,7 @@ consul-webhook-cert-manager-cvbfghb564-cbfg54  1/1     Running   0          1m
 ```
   
   
-25. On your Consul UI, the Service and Node tabs should reflect new nodes and a Mesh Gateway service in each partition. 
+27. On your Consul UI, the Service and Node tabs should reflect new nodes and a Mesh Gateway service in each partition. 
 
 
 # Deploy services onto each partition.
