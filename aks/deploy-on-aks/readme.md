@@ -336,7 +336,7 @@ kubectl apply -f apps/fakeapp/export-front.yaml --context $CLUSTER_CLIENT1_CTX
 ```
 kubectl apply -f apps/fakeapp/proxydefault.yaml --context $CLUSTER_CLIENT1_CTX   
 ```
-You will also need to do the following:
+
 
 26) View fakeapp service using EXTERNAL-IP:
 ```
