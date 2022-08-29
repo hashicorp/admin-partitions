@@ -23,6 +23,21 @@ If you deployed HCP Consul from the HCP Web UI the steps in this repo are simila
 
 Once your HCP Consul isa deployed and you've peered and routed your VNET, you can start configuring your Consul clients to the HCP Consul Cluster.
 
+
+1. Clone this repo.
+
+```
+git clone https://github.com/hashicorp/admin-partitions.git
+```
+
+2. Navigate to the ```/admin-partitions/aks/deploy-on-hcp-consul-azure-aks``` directory.
+```
+cd /admin-partitions/aks/deploy-on-hcp-consul-azure-aks
+```
+
+
+
+
 1. Login from your terminal to your Azure account. 
 ```
 az login
@@ -51,11 +66,9 @@ You can click the **Access Consul** dropdown and then click **Download to instal
 
 ![Client download](https://github.com/hashicorp/admin-partitions/blob/main/images/Screen%20Shot%202022-08-22%20at%2012.45.14%20PM.png)
 
-5. Unzip the client config package into the current working directory, and then use **ls** to confirm that both the client_config.json and ca.pem files are available.
-```
-ls
-ca.pem             client_config.json
-```
+5. Unzip the client config package and use **ls** to confirm that both the client_config.json and ca.pem files are available.  
+  Then copy files into your ```/admin-partitions/aks/deploy-on-hcp-consul-azure-aks``` working directory.  
+  
 
 6. On the HCP portal, go to your HCP Consul cluster. 
 
@@ -290,9 +303,10 @@ echo $CONSUL_HTTP_ADDR
 
 
 20. Now we can deploy the Consul clients into each partitions.  
-Add HashiCorp to your helm repo
+Add/update HashiCorp to your helm repo
 ```
 helm repo add hashicorp https://helm.releases.hashicorp.com
+helm repo update
 ```
 
 21. Deploy Consul client for team 1.
@@ -353,29 +367,29 @@ We will run through the steps manually so show you exactly how it works.
    
 1) Deploy frontend app.
 ```
-kubectl apply -f fakeapp/frontend.yaml --context $CLUSTER_CLIENT1_CTX
+ kubectl apply -f ../apps/fakeapp/frontend.yaml --context $CLUSTER_CLIENT1_CTX
 ```
    You should notice the frontend service appear in the Consul UI -> Services window from the team1 partition.
 
 2) Deploy backend app.
 ```
-kubectl apply -f fakeapp/backend.yaml --context $CLUSTER_CLIENT2_CTX
+kubectl apply -f ../apps/fakeapp/backend.yaml --context $CLUSTER_CLIENT2_CTX
 ```   
    You should notice the backend service appear in the Consul UI -> Services window from the team2 partition.
 
 3) Export services from partition "team2" to parition "team1".
 ``` 
-kubectl apply -f fakeapp/export-back.yaml --context $CLUSTER_CLIENT2_CTX
+kubectl apply -f ../apps/fakeapp/export-back.yaml --context $CLUSTER_CLIENT2_CTX
 ```   
    
 4) Export services from partition "team1" to parition "team2".
 ```   
-kubectl apply -f fakeapp/export-front.yaml --context $CLUSTER_CLIENT1_CTX   
+kubectl apply -f ../apps/fakeapp/export-front.yaml --context $CLUSTER_CLIENT1_CTX   
 ```   
 
 5) Deploy Proxy-default (or Service-default to specify granular service) to send frontend traffic to Mesh GW.
 ```
-kubectl apply -f fakeapp/proxydefault.yaml --context $CLUSTER_CLIENT1_CTX   
+kubectl apply -f ../apps/fakeapp/proxydefault.yaml --context $CLUSTER_CLIENT1_CTX   
 ```
 
 6) View fakeapp service using EXTERNAL-IP:
