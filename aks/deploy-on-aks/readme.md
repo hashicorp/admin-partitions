@@ -5,8 +5,9 @@ This repo will guide you through deploying Consul onto three Kubernetes clusters
 # Pre-reqs
 
 1) Clone this repo and navigate to the ```admin-partitions/aks/``` directory.
-
+```
    git clone https://github.com/hashicorp/admin-partitions.git
+```
 
 2) Deploy 3 AKS clusters in your Azure envronments. Make sure when you create your AKS clusters that you are selecting the Azure CNI (instead of Kubenet)
     
@@ -135,8 +136,8 @@ connectInject:
 controller:
   enabled: true
 
-#meshGateway:
-#  enabled: true
+meshGateway:
+  enabled: true
 
 dns:
   enabled: true
@@ -235,8 +236,8 @@ connectInject:
 controller:
   enabled: true
 
-#meshGateway:
-#  enabled: true
+meshGateway:
+  enabled: true
 
 dns:
   enabled: true
@@ -325,23 +326,17 @@ You should notice the backend service appear in the UI -> Services window from t
 kubectl apply -f apps/fakeapp/export-back.yaml --context $CLUSTER_CLIENT2_CTX
 ```
 
-24) (Optional) This step is only needed if you are connecting services in partitions that belong in different non-routable VPC/subnets. If so, run command below.
+24) Run command below.
   
 ```export services from partition "team1" to parition "team2".
 kubectl apply -f apps/fakeapp/export-front.yaml --context $CLUSTER_CLIENT1_CTX   
 ```
 
-25) (Optional) This step is only needed if you are connecting services in partitions that belong in different non-routable VPC/subnets.
-If so, Deploy Proxy-default (or Service-default to specify granular service) to send frontend traffic to Mesh GW.
+25) Deploy Proxy-default (or Service-default to specify granular service) to send frontend traffic to Mesh GW.
 ```
 kubectl apply -f proxydefault.yaml --context $CLUSTER_CLIENT1_CTX   
 ```
 You will also need to do the following:
-
-a) Add the mesh GW in the Consul client helm values files for each K8s Consul client clusters, and then use ```helm upgrade``` to update the Consul client deployment.
-b) Include Mesh GWs in exported-service config entries for both export-back.yaml and export-front.yaml files
-Reapply the export files from previous Step 3 + 4
-
 
 26) View fakeapp service using EXTERNAL-IP:
 ```
