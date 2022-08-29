@@ -404,3 +404,4 @@ http://<EXTERNAL-IP>:9090/ui
   You should see two boxes in grey color, depicting that there is connectivity. 
   If the boxes are in red, that means the frontend service is not able to reach the backend service.
 
+![alt text](https://github.com/hashicorp/admin-partitions/blob/main/images/Screen%20Shot%202022-05-10%20at%208.40.28%20AM.png)
