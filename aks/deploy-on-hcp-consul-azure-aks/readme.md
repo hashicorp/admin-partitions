@@ -16,7 +16,7 @@ If you deployed HCP Consul from the HCP Web UI the steps in this repo are simila
   Note: This [Learn guide](https://learn.hashicorp.com/tutorials/cloud/consul-client-aks?in=cloud/consul-cloud) can walk you through the steps of setting up HCP Consul on Azure.
 2. Ensure you followed provided steps to peer network connections between the HCP HashiCorp Vritual network (HVN) and your own VNET.
 3. Ensure you have followed provided steps to route traffic through your peering connections.
-4. Deploy 2 AKS clusters in your Azure envronments. Make sure when you create your AKS clusters that you are selecting the Azure CNI (instead of Kubenet)
+4. Deploy 2 AKS clusters in your Azure envronments. Make sure when you create your AKS clusters that you are selecting the **Azure CNI** (instead of Kubenet)
 5. Ensure you have helm installed on your machine. We will use helm to install the Consul clients to your AKS clusters.
 
 # Deploy Consul Clients on AKS
