@@ -4,7 +4,7 @@ Admin Partition is Consul's multi-tenancy feature allowing full isolation betwee
 We will connect two AKS clusters as Consul clients to an HCP Consul cluster. Each AKS cluster will represent a different team.
 
 
-For your reference, many of these steps similar to the Azure HCP tutorial on [Learn](https://learn.hashicorp.com/tutorials/cloud/consul-client-aks?in=cloud/consul-cloud).  
+For your reference, many of these steps similar to the Azure HCP tutorial on [Learn](https://learn.hashicorp.com/tutorials/cloud/consul-client-aks?in=cloud/consul-cloud#configure-development-host).  
 If you deployed HCP Consul from the HCP Web UI the steps in this repo are similar if you click on **Start from HCP Portal**.
 
 ![HCP](https://github.com/hashicorp/admin-partitions/blob/main/images/Screen%20Shot%202022-08-22%20at%2011.31.07%20AM.png)
