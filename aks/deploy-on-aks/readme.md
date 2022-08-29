@@ -334,7 +334,7 @@ kubectl apply -f apps/fakeapp/export-front.yaml --context $CLUSTER_CLIENT1_CTX
 
 25) Deploy Proxy-default (or Service-default to specify granular service) to send frontend traffic to Mesh GW.
 ```
-kubectl apply -f proxydefault.yaml --context $CLUSTER_CLIENT1_CTX   
+kubectl apply -f apps/fakeapp/proxydefault.yaml --context $CLUSTER_CLIENT1_CTX   
 ```
 You will also need to do the following:
 
