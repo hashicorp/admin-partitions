@@ -4,7 +4,7 @@ This repo will guide you through deploying Consul onto three Kubernetes clusters
 
 # Pre-reqs
 
-1) Clone this repo and navigate to the ```admin-partitions/aks/``` directory.
+1) Clone this repo and navigate to the ```admin-partitions/aks/deploy-on-aks``` directory.
 ```
    git clone https://github.com/hashicorp/admin-partitions.git
 ```
@@ -312,29 +312,29 @@ This is an example showing a simple app that has a frontend service in the "team
 
 21) Deploy frontend app.
 ```
-kubectl apply -f apps/fakeapp/frontend.yaml --context $CLUSTER_CLIENT1_CTX 
+kubectl apply -f ../apps/fakeapp/frontend.yaml --context $CLUSTER_CLIENT1_CTX 
 ```
 
 22) Deploy backend app.
 ```
-kubectl apply -f apps/fakeapp/backend.yaml --context $CLUSTER_CLIENT2_CTX
+kubectl apply -f ../apps/fakeapp/backend.yaml --context $CLUSTER_CLIENT2_CTX
 ```
 You should notice the backend service appear in the UI -> Services window from the team2 partition.
 
 23) Export services from partition "team2" to parition "team1".
 ```
-kubectl apply -f apps/fakeapp/export-back.yaml --context $CLUSTER_CLIENT2_CTX
+kubectl apply -f ../apps/fakeapp/export-back.yaml --context $CLUSTER_CLIENT2_CTX
 ```
 
 24) Run command below.
   
 ```export services from partition "team1" to parition "team2".
-kubectl apply -f apps/fakeapp/export-front.yaml --context $CLUSTER_CLIENT1_CTX   
+kubectl apply -f ../apps/fakeapp/export-front.yaml --context $CLUSTER_CLIENT1_CTX   
 ```
 
 25) Deploy Proxy-default (or Service-default to specify granular service) to send frontend traffic to Mesh GW.
 ```
-kubectl apply -f apps/fakeapp/proxydefault.yaml --context $CLUSTER_CLIENT1_CTX   
+kubectl apply -f ../apps/fakeapp/proxydefault.yaml --context $CLUSTER_CLIENT1_CTX   
 ```
 
 
