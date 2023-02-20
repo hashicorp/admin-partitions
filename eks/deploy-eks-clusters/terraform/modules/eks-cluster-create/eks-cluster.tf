@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 #
 # This file is modeled from the usage example link: https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest#usage-example
 # I also leveraged part of the example from this link: https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/examples/managed_node_groups/main.tf

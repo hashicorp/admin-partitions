@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 #############################################
 # Setting env variables. 
 # Change AWSREGION and CONSUL_LICENSE as needed

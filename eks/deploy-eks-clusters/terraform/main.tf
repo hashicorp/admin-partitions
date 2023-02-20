@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 
 ############################################################################
 # Create EKS three Clusters, Consul Server, Consul Client 1, Consul Client 2
