@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2021, 2026
+
 ########################################
 # Setting env variables. 
 # Change AWSREGION and CONSUL_LICENSE as needed  

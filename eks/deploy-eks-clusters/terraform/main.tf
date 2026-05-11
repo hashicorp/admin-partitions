@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2021, 2026
+
 
 ############################################################################
 # Create EKS three Clusters, Consul Server, Consul Client 1, Consul Client 2
